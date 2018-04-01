@@ -1,12 +1,19 @@
 #! /bin/bash
 shopt -s globstar
+progress=0
+total=0
 cd $1
 for i in **/*.{wma,ra}
 do 
+	((total++));
+done
+for i in **/*.{wma,ra}
+do 
+	((progress++));	
 	echo "========================================================================================"; echo "========================================================================================";
-	echo "Found $i";
+	echo "Found ($progress/$total): \"$i\"";
 	o=$(echo $i | sed -E 's/\.(wma|ra)/\.mp3/');
-	echo "Converting to $o";
+	echo "Converting to \"$o\"";
 	ffmpeg -i "$i" "$o";
 	exitcode=$?; 		
 	if [ $exitcode == '0' ]		
@@ -18,9 +25,9 @@ do
 			echo "FAILURE FAILURE FAILURE FAILURE FAILURE"; echo "FAILURE FAILURE FAILURE FAILURE FAILURE";
 			echo "FAILURE FAILURE FAILURE FAILURE FAILURE"; echo "FAILURE FAILURE FAILURE FAILURE FAILURE";
 			echo "exit code: $exitcode";
-			echo "Error in $i, Exit Code $exitcode">> errors.log
+			echo "Error in $progress of $total, Filename: \"$i\", Exit Code $exitcode">> errors.log
 		fi
-	echo "done";
+	echo "Done ($progress/$total): \"$o\"z";
 	echo "========================================================================================"; echo "========================================================================================";
 done
 cat errors.log
